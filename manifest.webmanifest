@@ -1,0 +1,17 @@
+{
+  "name": "Financia — Consultório",
+  "short_name": "Financia",
+  "description": "Pacientes, agendamentos e recebimentos do consultório.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f4f1",
+  "theme_color": "#2a78d6",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%232a78d6'/%3E%3Ctext x='256' y='350' font-size='260' text-anchor='middle'%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
