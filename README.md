@@ -2,22 +2,44 @@
 
 App web para cadastro de pacientes, agenda de sessões, registro de pagamentos e
 acompanhamento da evolução do faturamento. Feito para uso no **celular**, com
-backup em arquivo para levar os dados para o notebook.
+sincronização cifrada entre aparelhos e backup em arquivo.
+
+- **Produção:** https://minha-agenda-psi.netlify.app (site `minha-agenda-psi` na Netlify)
+- **Código:** https://github.com/Renh-cv23/financia_hellen
+- **Andamento e pendências:** [PROGRESS.md](PROGRESS.md)
 
 ## Como usar
 
-**No computador:** abra `index.html` no navegador (duplo clique já funciona).
-
-**No celular (recomendado):** publique a pasta em qualquer hospedagem estática
-— GitHub Pages, Netlify, Vercel — abra o endereço no Chrome/Safari e use
+**No celular (recomendado):** abra o endereço de produção no Chrome/Safari e use
 "Adicionar à tela de início". O app abre em tela cheia, como um aplicativo, e
 funciona sem internet depois de carregado.
 
-Para testar localmente em rede:
+**No computador:** pelo mesmo endereço. Abrir `index.html` direto do arquivo
+também funciona, mas aí a sincronização na nuvem fica indisponível.
+
+Para testar localmente:
 
 ```bash
-python3 -m http.server 8000     # e acesse http://<ip-do-pc>:8000 pelo celular
+python3 -m http.server 8000     # só o app, sem a função de sincronização
+netlify dev                     # app + função /api/sync (Blobs local)
 ```
+
+## Publicar (deploy)
+
+O site **não** está ligado ao GitHub: `git push` não publica sozinho. O deploy é
+feito pela linha de comando, a partir desta pasta (já ligada ao site com
+`netlify link`):
+
+```bash
+export PATH=~/.local/node/bin:$PATH     # Node instalado no usuário, sem sudo
+netlify deploy --prod --no-build
+```
+
+O `--no-build` vale porque não existe etapa de build: a pasta é publicada como
+está, e a CLI empacota a função com o `@netlify/blobs`. O `node_modules/` fica
+fora da publicação. Para cada `push` publicar sozinho, ligue o repositório no
+painel da Netlify (*Site configuration → Build & deploy → Link repository*); o
+`netlify.toml` já tem as configurações.
 
 ## Planos de pagamento
 
@@ -94,9 +116,15 @@ internet ele continua funcionando normalmente e sincroniza quando a rede volta.
    usar uma senha escolhida por você, rode `python3 scripts/gerar_senha.py "sua senha"`.
 2. No painel da Netlify: *Site configuration → Environment variables* →
    `SYNC_AUTH_HASH` = o hash gerado.
-3. Publique por **Git** (repositório ligado ao site) ou pela linha de comando
-   (`netlify deploy --prod`). Arrastar a pasta para o painel **não** publica a
+   (já feito em `minha-agenda-psi`; por CLI: `netlify env:set SYNC_AUTH_HASH <hash>`).
+3. Publique (ver *Publicar*). Arrastar a pasta para o painel **não** publica a
    função `netlify/functions/sync.mjs`.
+
+Conferência rápida: `https://minha-agenda-psi.netlify.app/api/sync` sem senha
+deve responder `{"erro":"senha incorreta"}`. Se responder
+`SYNC_AUTH_HASH não configurada`, falta a variável ou o redeploy depois dela.
+
+A senha **não** fica no repositório: guarde-a num gerenciador de senhas.
 
 Para trocar a senha, gere um novo hash, atualize a variável, publique de novo e
 reconecte cada aparelho. O primeiro aparelho a reconectar oferece substituir a
@@ -156,6 +184,8 @@ js/painel.js            tela de painel
 js/dados.js             tela de backup/ajustes
 js/sync.js              sincronização cifrada com a nuvem (cliente)
 netlify/functions/sync.mjs  guarda/devolve o bloco cifrado (Netlify Blobs)
+netlify.toml            publica a raiz; funções em netlify/functions
+package.json            dependência da função (@netlify/blobs)
 scripts/gerar_senha.py  gera a senha e o SYNC_AUTH_HASH
 js/app.js               navegação, tema e inicialização
 ```
